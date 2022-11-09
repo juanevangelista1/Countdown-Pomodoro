@@ -1,73 +1,23 @@
-﻿<!-- Observações: -->
+## Projeto Counndown Pomodoro
 
-interface CyclesContextType {
-activeCycle: Cycle | undefined
-activeCycleId: string | null
-amountSecondsPassed: number
-markCurrentCycleAsFinished: () => void
-setSecondsPassed: (seconds: number) => void
-}
 
-const newCycleFormValidationSchema = zod.object({
-task: zod.string().min(1, 'Informe a tarefa'),
-minutesAmount: zod.number().min(5).max(60),
-})
+Durante este desafio, utilizamos conceitos um pouco mais avançados desenvolvendo do zero uma aplicação de um timer para aplicar a técnica pomodoro! A aplicação conta com 2 telas sendo a primeira uma tela de apresentação do timer. Na segunda tela, temos o histórico das contagens do usuário, assim como o seu status, concluída, interrompida e em andamento. 
 
-// A biblioteca ZOD extrai a tipagem do Schema de validação: (schema de validação acima e a tipagem está abaixo)
+### 🛠️ Nesse projeto foi utilizado
 
-type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+* Vite
+* Styled Components
+* Local Storage
+* Typescript
+* Context API
+* React Router Dom
+* React Hook Form
+* Validações de formulário com Zod
 
-export const CyclesContext = createContext({} as CyclesContextType)
+<br />
 
-export function Home() {
-// Estado para armazenar o ciclo em si:
-const [cycles, setCycles] = useState<Cycle[]>([])
-const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
-// Exemplo de Uncontrolled para o INPUT do usuário.
-// O register retorna alguns métodos que servem para trabalhar com os inputs do JS => como onChange...
+<a href="https://countdown-pomodoro.vercel.app/" target="_blank">
+<img src="https://user-images.githubusercontent.com/71772559/178192066-d52e0cf7-906e-4baa-80f3-4b49dde153c0.png" />
+</a>
 
-const newCycleForm = useForm<NewCycleFormData>({
-resolver: zodResolver(newCycleFormValidationSchema),
-defaultValues: {
-task: '',
-minutesAmount: 0,
-},
-})
 
-const { handleSubmit, watch, reset } = newCycleForm
-
-const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
-
-function setSecondsPassed(seconds: number) {
-setAmountSecondsPassed(seconds)
-}
-
-function markCurrentCycleAsFinished() {
-setCycles((state) =>
-state.map((cycle) => {
-if (cycle.id === activeCycleId) {
-return { ...cycle, finishedDate: new Date() }
-} else {
-return cycle
-}
-}),
-)
-}
-
-function handleCreateNewCycle(data: NewCycleFormData) {
-const id = String(new Date().getTime())
-const newCycle: Cycle = {
-id,
-task: data.task,
-minutesAmount: data.minutesAmount,
-startDate: new Date(),
-}
-// Sempre que a mudança de estado depender de um estado anterior, usamos uma arrow function.
-setCycles((state) => [...cycles, newCycle])
-
-    setActiveCycleId(id)
-    setAmountSecondsPassed(0)
-    reset()
-
-}
